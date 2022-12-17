@@ -17,10 +17,31 @@ jobs:
                 --template-file template.yml \
                 --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
                 --region ${AWS_DEFAULT_REGION}
+  # Exercise: Config and Deployment
+  configure_infrastructure: 
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+              # You can get this ID in the section where you registered the SSH Key
+              fingerprints: ["b9:ac:c9:21:f6:1d:f5:69:87:e4:e0:88:69:9d:e4:d2"] 
+      - run:
+          name: Install Ansible
+          command: |
+            # Install Ansible
+            apk add --update ansible
+      - run:
+          name: Run Playbook and Configure server
+          command: |
+            # Your command
+            ansible-playbook -i inventory main-remote.yml
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
   myWorkflow:
     jobs:
-      - create_infrastructure
+      #- create_infrastructure
+      - configure_infrastructure
+
